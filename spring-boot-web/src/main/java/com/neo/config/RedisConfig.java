@@ -20,44 +20,45 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableCaching
-public class RedisConfig extends CachingConfigurerSupport{
-	
+public class RedisConfig extends CachingConfigurerSupport {
+
+	@Override
 	@Bean
 	public KeyGenerator keyGenerator() {
-        return new KeyGenerator() {
-            @Override
-            public Object generate(Object target, Method method, Object... params) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName());
-                sb.append(method.getName());
-                for (Object obj : params) {
-                    sb.append(obj.toString());
-                }
-                return sb.toString();
-            }
-        };
-    }
+		return new KeyGenerator() {
+			@Override
+			public Object generate(final Object target, final Method method, final Object... params) {
+				final StringBuilder sb = new StringBuilder();
+				sb.append(target.getClass().getName());
+				sb.append(method.getName());
+				for (final Object obj : params) {
+					sb.append(obj.toString());
+				}
+				return sb.toString();
+			}
+		};
+	}
 
-    @SuppressWarnings("rawtypes")
-    @Bean
-    public CacheManager cacheManager(RedisTemplate redisTemplate) {
-        RedisCacheManager rcm = new RedisCacheManager(redisTemplate);
-        //设置缓存过期时间
-        //rcm.setDefaultExpiration(60);//秒
-        return rcm;
-    }
-    
-    @Bean
-    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
-        StringRedisTemplate template = new StringRedisTemplate(factory);
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.afterPropertiesSet();
-        return template;
-    }
+	@SuppressWarnings("rawtypes")
+	@Bean
+	public CacheManager cacheManager(final RedisTemplate redisTemplate) {
+		final RedisCacheManager rcm = new RedisCacheManager(redisTemplate);
+		// 设置缓存过期时间
+		// rcm.setDefaultExpiration(60);//秒
+		return rcm;
+	}
+
+	@Bean
+	public RedisTemplate<String, String> redisTemplate(final RedisConnectionFactory factory) {
+		final StringRedisTemplate template = new StringRedisTemplate(factory);
+		final Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+		final ObjectMapper om = new ObjectMapper();
+		om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		jackson2JsonRedisSerializer.setObjectMapper(om);
+		template.setValueSerializer(jackson2JsonRedisSerializer);
+		template.afterPropertiesSet();
+		return template;
+	}
 
 }
